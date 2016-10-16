@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script rel="stylesheet" src="scripts/validate.js" type="text/javascript"></script>
+		<link href="css/main.css" type="text/css" />
+		<title>Project</title>
+	</head>
+	<body>
+		<h1>Welcome!</h1>
+		<form method="post" action="LoginServlet" onsubmit="return validateForm()">
+			<label>Username:<input id="username" name="username" type="text" value="" /></label><br/>
+     		<label>Password:<input id="password" name="password" type="password" value="" /></label><br/>
+     		<input type="submit" value="Go!" />
+		</form>
+		<p id="error"/>
+
+	</p>
+	</body>
+</html>
