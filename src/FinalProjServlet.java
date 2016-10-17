@@ -1,10 +1,12 @@
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,16 +38,16 @@ import freemarker.template.Version;
 /**
  * Servlet implementation class LoginServlet
  */
-@WebServlet("/LoginServlet")
+@WebServlet("/FinalProjServlet")
 @MultipartConfig(maxFileSize = 16177215)
-public class LoginServlet extends HttpServlet {
+public class FinalProjServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static DbAccessImpl dbAccess;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public LoginServlet() {
+    public FinalProjServlet() {
         super();
         dbAccess = new DbAccessImpl();
     }
@@ -68,8 +70,7 @@ public class LoginServlet extends HttpServlet {
 		case "getImg":
 			getImage(con, request, response);
 		default:
-			break;
-				
+			break;		
 		}
 	}
 
@@ -78,13 +79,19 @@ public class LoginServlet extends HttpServlet {
 		response.setContentType( "image/jpg" );
 		String postId = request.getParameter("postId");
 		String query = "select img1 from car_post where id=" + postId;
+		System.out.println(query);
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs!=null) {
 			try {
-				while(rs.next()) {
-					
+				if(rs.next()) {
+					Blob blob = rs.getBlob("img1");
+					BufferedOutputStream bos = new BufferedOutputStream( response.getOutputStream( ) );
+					bos.write(blob.getBytes(1, (int)blob.length()));
 				}
 			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -93,6 +100,7 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	private void viewPosts(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		ArrayList<CarPost> posts = new ArrayList<>();
 		String query = "select * from car_post";
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs != null) {
@@ -100,30 +108,54 @@ public class LoginServlet extends HttpServlet {
 				while(rs.next()) {
 					String make = rs.getString("make");
 					String model = rs.getString("model");
-					System.out.println(make + " " + model);
+					String year = rs.getString("year");
+					String title = rs.getString("title");
+					String id = rs.getString("id");
+					String userId = rs.getString("user_id");
+					CarPost post = new CarPost(id, userId, year, make, model, title);
+					posts.add(post);
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+		//freemarker setup
+		Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+		try {					
+			String path = getServletContext().getRealPath("/WEB-INF/templates/");
+			cfg.setDirectoryForTemplateLoading(new File(path));
+			cfg.setDefaultEncoding("UTF-8");
+			cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+			cfg.setLogTemplateExceptions(false);		
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
+		Map<String, Object> root = new HashMap<>();
+		root.put("posts", posts);
+		Template temp;
+		try {
+			temp = cfg.getTemplate("view.ftlh");
+			Writer out = new OutputStreamWriter(response.getOutputStream());
+			temp.process(root, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TemplateException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void uploadPost(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		System.out.println("Upload!");
 		String make = request.getParameter("make");
 		String model = request.getParameter("model");
+		String year = request.getParameter("year");
+		String title = request.getParameter("title");
 
 		InputStream inputStream = null; // input stream of the upload file
         try {
 			Part filePart = request.getPart("pic1");
 			if (filePart != null) {
-	            // prints out some information for debugging
-	            System.out.println(filePart.getName());
-	            System.out.println(filePart.getSize());
-	            System.out.println(filePart.getContentType());
-	             
 	            // obtains input stream of the upload file
 	            inputStream = filePart.getInputStream();
 	        }
@@ -134,15 +166,16 @@ public class LoginServlet extends HttpServlet {
         String sql = "INSERT INTO car_post (id, user_id, year, make, model, title, img1) values (NULL, ?, ?, ?, ?, ?, ?)";
         try {
 			PreparedStatement statement = con.prepareStatement(sql);
-			statement.setInt(1, 1);
-			statement.setInt(2, 2005);
+			statement.setInt(1, Integer.parseInt("1"));
+			statement.setInt(2, Integer.parseInt(year));
 			statement.setString(3, make);
 			statement.setString(4, model);
-			statement.setString(5, "Test Upload");
+			statement.setString(5, title);
 			if (inputStream != null) {
                 // fetches input stream of the upload file for the blob column
                 statement.setBlob(6, inputStream);
             }
+			System.out.println(statement.toString());
 			int row = statement.executeUpdate();
 			
 		} catch (SQLException e) {
