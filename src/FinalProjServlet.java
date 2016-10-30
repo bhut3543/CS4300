@@ -61,6 +61,12 @@ public class FinalProjServlet extends HttpServlet {
 		Connection con = dbAccess.connect();
 		String action = request.getParameter("action");
 		switch(action) {
+		case "login":
+			loginUser(con, request, response);
+			break;
+		case "register":
+			loginUser(con, request, response);
+			break;
 		case "upload":
 			uploadPost(con, request, response);
 			break;
@@ -69,9 +75,67 @@ public class FinalProjServlet extends HttpServlet {
 			break;
 		case "getImg":
 			getImage(con, request, response);
+			break;
+		case "classified":
+			getClassified(con, request, response);
+			break;
 		default:
 			break;		
 		}
+	}
+
+	private void loginUser(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		
+		System.out.println(username + " " + password);
+		int id = -1;
+		
+		String query = String.format("select id from user where user=\"%s\" AND pass=\"%s\" limit 1", username, password);
+		ResultSet rs = dbAccess.retrieve(con, query);
+		if(rs != null) {
+			try {
+				while(rs.next()) {
+					id = rs.getInt("id");
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if(id != -1) {
+			//resultset wasn't empty!
+			
+			HttpSession session = request.getSession();  
+	        session.setAttribute("id",id);
+	        
+			Map<String, Object> root = new HashMap<>();
+			root.put("username", username);
+			
+			//freemarker setup
+			Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+			try {					
+				String path = getServletContext().getRealPath("/WEB-INF/templates/");
+				cfg.setDirectoryForTemplateLoading(new File(path));
+				cfg.setDefaultEncoding("UTF-8");
+				cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+				cfg.setLogTemplateExceptions(false);		
+			} catch (IOException e) {
+					e.printStackTrace();
+			}
+			Template temp;
+			try {
+				temp = cfg.getTemplate("mainpage.ftlh");
+				Writer out = new OutputStreamWriter(response.getOutputStream());
+				temp.process(root, out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (TemplateException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 	private void getImage(Connection con, HttpServletRequest request, HttpServletResponse response) {
@@ -146,7 +210,8 @@ public class FinalProjServlet extends HttpServlet {
 	}
 
 	private void uploadPost(Connection con, HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("Upload!");
+		HttpSession session = request.getSession();
+		int userId = ((Integer)session.getAttribute("id"));
 		String make = request.getParameter("make");
 		String model = request.getParameter("model");
 		String year = request.getParameter("year");
@@ -166,7 +231,7 @@ public class FinalProjServlet extends HttpServlet {
         String sql = "INSERT INTO car_post (id, user_id, year, make, model, title, img1) values (NULL, ?, ?, ?, ?, ?, ?)";
         try {
 			PreparedStatement statement = con.prepareStatement(sql);
-			statement.setInt(1, Integer.parseInt("1"));
+			statement.setInt(1, userId);
 			statement.setInt(2, Integer.parseInt(year));
 			statement.setString(3, make);
 			statement.setString(4, model);

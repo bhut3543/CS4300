@@ -7,7 +7,7 @@
 		<title>Vehicles for Harambe</title>
 	</head>
 	<body>
-		<h1>Welcome!</h1>
+		<h1>Welcome ${username}!</h1>
     <a href="login.html">Login to VFH</a><br /><br />
     <a href="FinalProjServlet?action=view">View Classifieds</a>
     <h1>Post to Classifieds</h1>

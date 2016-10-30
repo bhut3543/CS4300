@@ -7,14 +7,21 @@
 		<title>Project</title>
 	</head>
 	<body>
-		<h1>Welcome!</h1>
-		<form method="post" action="LoginServlet" onsubmit="return validateForm()">
+		<h1>Login to VFH</h1>
+		<form method="post" action="FinalProjServlet" onsubmit="return validateForm()">
+			 <input class="hidden" type="hidden" name="action" value="login"  />
 			<label>Username:<input id="username" name="username" type="text" value="" /></label><br/>
      		<label>Password:<input id="password" name="password" type="password" value="" /></label><br/>
-     		<input type="submit" value="Go!" />
+     		<input type="submit" value="Login!" />
 		</form>
 		<p id="error"/>
-
+		<h1>Register</h1>
+		<form method="post" action="FinalProjServlet" onsubmit="return validateForm()">
+			<input class="hidden" type="hidden" name="action" value="register"  />
+			<label>Username:<input id="username" name="username" type="text" value="" /></label><br/>
+     		<label>Password:<input id="password" name="password" type="password" value="" /></label><br/>
+     		<input type="submit" value="Register!" />
+		</form>
 	</p>
 	</body>
 </html>

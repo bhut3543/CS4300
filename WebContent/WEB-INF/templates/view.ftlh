@@ -15,6 +15,7 @@
         <th>Year</th>
         <th>Make</th>
         <th>Model</th>
+        <th>View Classified</th>
       </tr>
       <#list posts as post>
       	<tr>
@@ -24,6 +25,7 @@
         	<td>${post.year}</td>
         	<td>${post.make}</td>
         	<td>${post.model}</td>
+        	<td><a href="/FinalProjServlet?action=classified&postId=${post.id}" alt="">View Classified</a>
         </tr>
       </#list>
     </table>
