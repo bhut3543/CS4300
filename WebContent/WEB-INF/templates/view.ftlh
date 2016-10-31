@@ -19,7 +19,7 @@
       </tr>
       <#list posts as post>
       	<tr>
-        	<td><img src="http://localhost:8080/4300Project/FinalProjServlet?action=getImg&postId=${post.id}" alt=""/></td>
+        	<td><img src="http://localhost:8080/4300Project/FinalProjServlet?action=getImg&pic=1&postId=${post.id}" alt=""/></td>
 			<!-- <td><img src="pic.jpg" alt=""/></td> -->
         	<td>${post.title}</td>
         	<td>${post.year}</td>
