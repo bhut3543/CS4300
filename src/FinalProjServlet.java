@@ -84,6 +84,66 @@ public class FinalProjServlet extends HttpServlet {
 		}
 	}
 
+	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		int postId = Integer.parseInt(request.getParameter("postId"));
+		String query = String.format("select * from car_post where id=%s", postId);
+		
+		String id = ""+postId,  userId = null, year = null, make = null, model = null, title = null;
+		int price = 0;
+		String description = null, postTime = null;
+		boolean hasCarfax = false;
+		
+		ResultSet rs = dbAccess.retrieve(con, query);
+		if(rs != null) {
+			try {
+				while(rs.next()) {
+					userId = rs.getString("user_id");
+					year = rs.getString("year");
+					make = rs.getString("make");
+					model = rs.getString("model");
+					title = rs.getString("title");
+					price = rs.getInt("price");
+					description = rs.getString("description");
+					postTime = rs.getString("post_time");
+					hasCarfax = rs.getBoolean("has_carfax");
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		CarPost post = new CarPost(id, userId, year, make, model, title, price, description, postTime, hasCarfax);
+		Map<String, Object> root = new HashMap<>();
+		root.put("post", post);
+		
+		//freemarker setup
+		Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+		try {					
+			String path = getServletContext().getRealPath("/WEB-INF/templates/");
+			cfg.setDirectoryForTemplateLoading(new File(path));
+			cfg.setDefaultEncoding("UTF-8");
+			cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+			cfg.setLogTemplateExceptions(false);		
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
+		Template temp;
+		try {
+			temp = cfg.getTemplate("classifiedview.ftlh");
+			Writer out = new OutputStreamWriter(response.getOutputStream());
+			temp.process(root, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TemplateException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+	}
+
 	private void loginUser(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -142,13 +202,18 @@ public class FinalProjServlet extends HttpServlet {
 		//http://stackoverflow.com/questions/38353711/retrieve-image-blob-from-mysql-using-servlet-and-display-it-at-jsp
 		response.setContentType( "image/jpg" );
 		String postId = request.getParameter("postId");
-		String query = "select img1 from car_post where id=" + postId;
+		int picNum = Integer.parseInt(request.getParameter("pic"));
+		if(picNum < 1 || picNum > 5) {
+			picNum = 1;
+		}
+		String imgStr = "img" + picNum;
+		String query = "select " + imgStr + " from car_post where id=" + postId;
 		System.out.println(query);
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs!=null) {
 			try {
 				if(rs.next()) {
-					Blob blob = rs.getBlob("img1");
+					Blob blob = rs.getBlob(imgStr);
 					BufferedOutputStream bos = new BufferedOutputStream( response.getOutputStream( ) );
 					bos.write(blob.getBytes(1, (int)blob.length()));
 				}
