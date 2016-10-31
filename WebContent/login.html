@@ -3,10 +3,11 @@
 	<head>
 		<meta charset="UTF-8">
 		<script rel="stylesheet" src="scripts/validate.js" type="text/javascript"></script>
-		<link href="css/main.css" type="text/css" />
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<title>Project</title>
 	</head>
 	<body>
+		<div id = formContainer>
 		<h1>Login to VFH</h1>
 		<form method="post" action="FinalProjServlet" onsubmit="return validateForm()">
 			 <input class="hidden" type="hidden" name="action" value="login"  />
@@ -22,6 +23,6 @@
      		<label>Password:<input id="password" name="password" type="password" value="" /></label><br/>
      		<input type="submit" value="Register!" />
 		</form>
-	</p>
+	</div>
 	</body>
 </html>

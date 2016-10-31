@@ -19,13 +19,13 @@
       </tr>
       <#list posts as post>
       	<tr>
-        	<td><img src="/4300Project/FinalProjServlet?action=getImg&pic=1&postId=${post.id}" alt=""/></td>
+        	<td><img src="http://localhost:8080/4300Project/FinalProjServlet?action=getImg&postId=${post.id}" alt=""/></td>
 			<!-- <td><img src="pic.jpg" alt=""/></td> -->
         	<td>${post.title}</td>
         	<td>${post.year}</td>
         	<td>${post.make}</td>
         	<td>${post.model}</td>
-        	<td><a href="/4300Project/FinalProjServlet?action=classified&postId=${post.id}" alt="">View Classified</a>
+        	<td><a href="/FinalProjServlet?action=classified&postId=${post.id}" alt="">View Classified</a>
         </tr>
       </#list>
     </table>
