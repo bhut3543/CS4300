@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<script src="scripts/validate.js" type="text/javascript"></script>
-		<link rel="stylesheet" href="css/main.css" type="text/css" />
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<title>Vehicles for Harambe</title>
 	</head>
 	<body>
