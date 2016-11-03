@@ -86,17 +86,20 @@ public class FinalProjServlet extends HttpServlet {
 
 	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		int postId = Integer.parseInt(request.getParameter("postId"));
-		String query = String.format("select * from car_post where id=%s", postId);
+		String query = String.format("select * from car_post c JOIN car_info i where c.id=%s", postId);
 		
 		String id = ""+postId,  userId = null, year = null, make = null, model = null, title = null;
+		String carInfoId = null;
 		int price = 0;
 		String description = null, postTime = null;
 		boolean hasCarfax = false;
 		
+		//get car_post info
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs != null) {
 			try {
 				while(rs.next()) {
+					carInfoId = rs.getString("car_info_id");
 					userId = rs.getString("user_id");
 					year = rs.getString("year");
 					make = rs.getString("make");
@@ -113,6 +116,28 @@ public class FinalProjServlet extends HttpServlet {
 			}
 		}
 		
+//		//get specific car_info
+//		query = String.format("select * from car_info where id=%s", postId);
+//		rs = dbAccess.retrieve(con, query);
+//		if(rs != null) {
+//			try {
+//				while(rs.next()) {
+////					carInfoId = rs.getString("car_info_id");
+////					userId = rs.getString("user_id");
+//					year = rs.getString("year");
+//					make = rs.getString("make");
+//					model = rs.getString("model");
+////					title = rs.getString("title");
+////					price = rs.getInt("price");
+////					description = rs.getString("description");
+////					postTime = rs.getString("post_time");
+////					hasCarfax = rs.getBoolean("has_carfax");
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		CarPost post = new CarPost(id, userId, year, make, model, title, price, description, postTime, hasCarfax);
 		Map<String, Object> root = new HashMap<>();
 		root.put("post", post);
@@ -215,7 +240,6 @@ public class FinalProjServlet extends HttpServlet {
 				if(rs.next()) {
 					Blob blob = rs.getBlob(imgStr);
 					BufferedOutputStream bos = new BufferedOutputStream( response.getOutputStream( ) );
-					bos.write(blob.getBytes(1, (int)blob.length()));
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -230,7 +254,7 @@ public class FinalProjServlet extends HttpServlet {
 
 	private void viewPosts(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		ArrayList<CarPost> posts = new ArrayList<>();
-		String query = "select * from car_post";
+		String query = "select make,model,year,title,c.id,user_id from car_post c JOIN car_info i where c.car_info_id=i.id";
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs != null) {
 			try {
