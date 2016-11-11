@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.mysql.jdbc.ResultSetMetaData;
+import com.mysql.jdbc.Statement;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -172,8 +173,7 @@ public class FinalProjServlet extends HttpServlet {
 	private void loginUser(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		
-		System.out.println(username + " " + password);
+	
 		int id = -1;
 		
 		String query = String.format("select id from user where user=\"%s\" AND pass=\"%s\" limit 1", username, password);
@@ -233,13 +233,13 @@ public class FinalProjServlet extends HttpServlet {
 		}
 		String imgStr = "img" + picNum;
 		String query = "select " + imgStr + " from car_post where id=" + postId;
-		System.out.println(query);
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs!=null) {
 			try {
 				if(rs.next()) {
 					Blob blob = rs.getBlob(imgStr);
 					BufferedOutputStream bos = new BufferedOutputStream( response.getOutputStream( ) );
+					bos.write(blob.getBytes(1, (int)blob.length()));
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -298,13 +298,57 @@ public class FinalProjServlet extends HttpServlet {
 		}
 	}
 
+	/*
+	 * INCORRECT USE OF "Statement.executeUpdate()"
+	 * SHOULD GET LAST ID FROM *NEW* FUNCTION IN DbAccessImpl
+	 */
 	private void uploadPost(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
+		if(session == null) {
+			return;
+		}
 		int userId = ((Integer)session.getAttribute("id"));
+		String vin = request.getParameter("vin").toUpperCase();
 		String make = request.getParameter("make");
 		String model = request.getParameter("model");
 		String year = request.getParameter("year");
 		String title = request.getParameter("title");
+		String color = request.getParameter("color").toUpperCase();
+		String driveType = request.getParameter("drive_type").toUpperCase();
+		String bodyStyle = request.getParameter("body_style").toUpperCase();
+		String engine = request.getParameter("engine").toUpperCase();
+		int horsepower = Integer.parseInt(request.getParameter("hp"));
+		int odometer = Integer.parseInt(request.getParameter("odometer"));
+		boolean hasCarfax = Boolean.parseBoolean(request.getParameter("has_carfax"));
+		String carInfoSql = "INSERT INTO car_info (id, vin, color, body_style, drive_type, year, make, model, engine, power_hp, odometer) " 
+				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		int carInfoId = 123;
+		try {
+			PreparedStatement statement = con.prepareStatement(carInfoSql, Statement.RETURN_GENERATED_KEYS);
+			statement.setString(1, vin); //vin
+			statement.setString(2, color); //color
+			statement.setString(3, bodyStyle); //body style
+			statement.setString(4, driveType); //drive type
+			statement.setInt(5, Integer.parseInt(year)); //year
+			statement.setString(6, make); //make
+			statement.setString(7, model); //model
+			statement.setString(8, engine); //engine
+			statement.setInt(9, horsepower); //hp
+			statement.setInt(10, odometer); //odo
+			
+			//BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD 
+			statement.executeUpdate(); 
+			ResultSet rs = statement.getGeneratedKeys();
+		    rs.next();
+			carInfoId = rs.getInt(1);
+			//BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 
 		InputStream inputStream = null; // input stream of the upload file
         try {
@@ -317,19 +361,17 @@ public class FinalProjServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        String sql = "INSERT INTO car_post (id, user_id, year, make, model, title, img1) values (NULL, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO car_post (id, user_id, title, img1, has_carfax, car_info_id) values (NULL, ?, ?, ?, ?, ?)";
         try {
 			PreparedStatement statement = con.prepareStatement(sql);
 			statement.setInt(1, userId);
-			statement.setInt(2, Integer.parseInt(year));
-			statement.setString(3, make);
-			statement.setString(4, model);
-			statement.setString(5, title);
+			statement.setString(2, title);
 			if (inputStream != null) {
                 // fetches input stream of the upload file for the blob column
-                statement.setBlob(6, inputStream);
+                statement.setBlob(3, inputStream);
             }
-			System.out.println(statement.toString());
+			statement.setBoolean(4, hasCarfax);
+			statement.setInt(5, carInfoId);
 			int row = statement.executeUpdate();
 			
 		} catch (SQLException e) {

@@ -13,6 +13,7 @@
     <h1>Post to Classifieds</h1>
     <form method="post" action="FinalProjServlet" enctype="multipart/form-data">
     <input class="hidden" type="hidden" name="action" value="upload"  />
+      <label>VIN #: <input type="text" name="vin" required/></label><br />
       <label>Year: <input type="number" name="year" required/></label><br />
 	  <label>Make:
 	  <select name="make">
@@ -59,10 +60,19 @@
             <option value="Toyota">Toyota</option>
             <option value="Volkswagen">Volkswagen</option>
             <option value="Volvo">Volvo</option>
-            <option value="smart">smart</option>
+          	<option value="smart">smart</option>
       </select></label><br />
       <label>Model: <input type="text" name="model" required/></label><br />
       <label>Title: <input type="text" name="title" required/></label><br />
+      <label>Price: $<input type="text" name="price" required/></label><br />
+      <label>Description: <input type="text" name="description" required/></label><br />
+      <label>Color: <input type="text" name="color" required/></label><br />
+      <label>Body Style: <input type="text" name="body_style" required/></label><br />
+      <label>Drive Type: <input type="text" name="drive_type" required/></label><br />
+      <label>Engine Type: <input type="text" name="engine" required/></label><br />
+      <label>Horsepower: <input type="number" name="hp" required/></label><br />
+      <label>Odometer: <input type="number" name="odometer" required/></label><br />
+      <label>Has CarFax?: <input type="checkbox" name="has_carfax" required/></label><br />
       <input type="file" name="pic1" /><br />
       <input type="file" name="pic2" /><br />
       <input type="file" name="pic3" /><br />
