@@ -8,6 +8,7 @@
 	</head>
 	<body>
 		<h1>Classifieds</h1>
+		<label>Search Classifieds: <input type="text" name="search" required/></label><br />
     <table border=1>
       <tr>
         <th>Thumbnail</th>

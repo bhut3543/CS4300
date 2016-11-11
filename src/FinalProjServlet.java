@@ -349,29 +349,49 @@ public class FinalProjServlet extends HttpServlet {
 		}
 		
 		
-
-		InputStream inputStream = null; // input stream of the upload file
-        try {
-			Part filePart = request.getPart("pic1");
-			if (filePart != null) {
-	            // obtains input stream of the upload file
-	            inputStream = filePart.getInputStream();
-	        }
-		} catch (IOException | ServletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        String sql = "INSERT INTO car_post (id, user_id, title, img1, has_carfax, car_info_id) values (NULL, ?, ?, ?, ?, ?)";
+//        try {
+//			Part filePart = request.getPart("pic1");
+//			if (filePart != null) {
+//	            // obtains input stream of the upload file
+//	            inputStream = filePart.getInputStream();
+//	        }
+//		} catch (IOException | ServletException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+        String sql = "INSERT INTO car_post (id, user_id, title, img1, img2, img3, img4, img5, has_carfax, car_info_id) values (NULL, ?, ?, ?,?,?,?,?, ?, ?)";
         try {
 			PreparedStatement statement = con.prepareStatement(sql);
 			statement.setInt(1, userId);
 			statement.setString(2, title);
-			if (inputStream != null) {
-                // fetches input stream of the upload file for the blob column
-                statement.setBlob(3, inputStream);
-            }
-			statement.setBoolean(4, hasCarfax);
-			statement.setInt(5, carInfoId);
+			
+			int count = 3;
+			while(count < 8) {
+
+				InputStream inputStream = null; // input stream of the upload file
+				try {
+					Part filePart = request.getPart("pic" + (count -2));
+					if (filePart != null) {
+			            // obtains input stream of the upload file
+			            inputStream = filePart.getInputStream();
+			        }
+				} catch (IOException | ServletException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				statement.setBlob(count, inputStream);
+				count++;
+//				if (inputStream != null) {
+//	                // fetches input stream of the upload file for the blob column
+//	                
+//	            } else {
+//	            	
+//	            }
+			}
+			statement.setBoolean(8, hasCarfax);
+			statement.setInt(9, carInfoId);
+			
+			System.out.println(statement.toString());
 			int row = statement.executeUpdate();
 			
 		} catch (SQLException e) {
