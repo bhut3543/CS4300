@@ -5,6 +5,9 @@
 		<script src="scripts/jquery.js" type="text/javascript"></script>
 		<script src="scripts/jquery-ui.js" type="text/javascript"></script>
 		<script src="scripts/classifiedscript.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="css/jquery-ui.css" type="text/css" />
+		<link rel="stylesheet" href="css/jquery-ui.structure.css" type="text/css" />
+		<link rel="stylesheet" href="css/jquery-ui.theme.css" type="text/css" />
 		<link rel="stylesheet" href="css/classifieds.css" type="text/css" />
 		<title>Vehicles for Harambe</title>
 	</head>
