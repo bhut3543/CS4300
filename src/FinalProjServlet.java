@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,11 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -27,14 +24,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import com.mysql.jdbc.ResultSetMetaData;
 import com.mysql.jdbc.Statement;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import freemarker.template.Version;
 
 /**
  * Servlet implementation class LoginServlet
@@ -80,14 +75,39 @@ public class FinalProjServlet extends HttpServlet {
 		case "classified":
 			getClassified(con, request, response);
 			break;
+		case "regval":
+			checkValidUsername(con, request, response);
 		default:
 			break;		
 		}
 	}
 
+	private void checkValidUsername(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		response.setContentType("text/plain");
+		String user = request.getParameter("username");
+		System.out.println(user);
+		String query = String.format("select id from user where user='%s'", user);
+		
+		try {
+			PrintWriter pw = response.getWriter();
+
+			ResultSet rs = dbAccess.retrieve(con, query);
+			if(rs == null) {
+				pw.write("true");
+			} else {
+				pw.write("false");
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+	}
+
 	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		int postId = Integer.parseInt(request.getParameter("postId"));
-		String query = String.format("select * from car_post c JOIN car_info i where c.id=%s", postId);
+		String query = String.format("select * from car_post c JOIN car_info i where c.id=%d", postId);
 		
 		String id = ""+postId,  userId = null, year = null, make = null, model = null, title = null;
 		String carInfoId = null;
@@ -253,8 +273,18 @@ public class FinalProjServlet extends HttpServlet {
 	}
 
 	private void viewPosts(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		String searchParam = request.getParameter("search");
+		String query = "";
+		if(searchParam == null) {
+			query = "select make,model,year,title,c.id,user_id from car_post c JOIN car_info i where c.car_info_id=i.id";
+		} else {
+			query = String.format("select make,model,year,title,c.id,user_id from car_post c JOIN car_info i where c.car_info_id=i.id AND (i.make='%s' OR i.model='%s' OR i.year='%s')", searchParam, searchParam, searchParam);
+		}
+		
+		//;
+		
 		ArrayList<CarPost> posts = new ArrayList<>();
-		String query = "select make,model,year,title,c.id,user_id from car_post c JOIN car_info i where c.car_info_id=i.id";
+		
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs != null) {
 			try {
@@ -322,8 +352,9 @@ public class FinalProjServlet extends HttpServlet {
 		boolean hasCarfax = Boolean.parseBoolean(request.getParameter("has_carfax"));
 		String carInfoSql = "INSERT INTO car_info (id, vin, color, body_style, drive_type, year, make, model, engine, power_hp, odometer) " 
 				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		int carInfoId = 123;
+		int carInfoId = -1;
 		try {
+			System.out.println("info id is " + carInfoId);
 			PreparedStatement statement = con.prepareStatement(carInfoSql, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, vin); //vin
 			statement.setString(2, color); //color
@@ -341,6 +372,7 @@ public class FinalProjServlet extends HttpServlet {
 			ResultSet rs = statement.getGeneratedKeys();
 		    rs.next();
 			carInfoId = rs.getInt(1);
+			System.out.println("info id is " + carInfoId);
 			//BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD
 			
 		} catch (SQLException e) {
