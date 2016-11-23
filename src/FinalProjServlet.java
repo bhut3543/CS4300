@@ -106,6 +106,15 @@ public class FinalProjServlet extends HttpServlet {
 	}
 
 	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		if(session == null) {
+			return;
+		}
+		Integer currentUser = ((Integer)session.getAttribute("id"));
+		if(currentUser == null) {
+			currentUser = 0;
+		}
+		
 		int postId = Integer.parseInt(request.getParameter("postId"));
 		String query = String.format("select * from car_post c JOIN car_info i where c.id=%d", postId);
 		
@@ -114,6 +123,7 @@ public class FinalProjServlet extends HttpServlet {
 		int price = 0;
 		String description = null, postTime = null;
 		boolean hasCarfax = false;
+		boolean currentUsersPost = false;
 		
 		//get car_post info
 		ResultSet rs = dbAccess.retrieve(con, query);
@@ -130,6 +140,8 @@ public class FinalProjServlet extends HttpServlet {
 					description = rs.getString("description");
 					postTime = rs.getString("post_time");
 					hasCarfax = rs.getBoolean("has_carfax");
+
+					currentUsersPost = (currentUser == Integer.parseInt(userId));
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -162,6 +174,7 @@ public class FinalProjServlet extends HttpServlet {
 		CarPost post = new CarPost(id, userId, year, make, model, title, price, description, postTime, hasCarfax);
 		Map<String, Object> root = new HashMap<>();
 		root.put("post", post);
+		root.put("currentUsersPost", currentUsersPost);
 		
 		//freemarker setup
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
@@ -263,10 +276,10 @@ public class FinalProjServlet extends HttpServlet {
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
 		
@@ -353,8 +366,8 @@ public class FinalProjServlet extends HttpServlet {
 		int odometer = Integer.parseInt(request.getParameter("odometer"));
 		boolean hasCarfax = Boolean.parseBoolean(request.getParameter("has_carfax"));
 		int price = Integer.parseInt(request.getParameter("price"));
-		String carInfoSql = "INSERT INTO car_info (id, vin, color, body_style, drive_type, year, make, model, engine, power_hp, odometer, description, price) " 
-				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String carInfoSql = "INSERT INTO car_info (id, vin, color, body_style, drive_type, year, make, model, engine, power_hp, odometer) " 
+				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		int carInfoId = -1;
 		try {
 			System.out.println("info id is " + carInfoId);
@@ -369,8 +382,6 @@ public class FinalProjServlet extends HttpServlet {
 			statement.setString(8, engine); //engine
 			statement.setInt(9, horsepower); //hp
 			statement.setInt(10, odometer); //odo
-			statement.setString(11, description); //odo
-			statement.setInt(12, price); //odo
 			
 			//BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD 
 			statement.executeUpdate(); 
@@ -396,7 +407,7 @@ public class FinalProjServlet extends HttpServlet {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-        String sql = "INSERT INTO car_post (id, user_id, title, img1, img2, img3, img4, img5, has_carfax, car_info_id) values (NULL, ?, ?, ?,?,?,?,?, ?, ?)";
+        String sql = "INSERT INTO car_post (id, user_id, title, img1, img2, img3, img4, img5, has_carfax, car_info_id, description, price) values (NULL, ?, ?, ?,?,?,?,?, ?, ?,?,?)";
         try {
 			PreparedStatement statement = con.prepareStatement(sql);
 			statement.setInt(1, userId);
@@ -427,6 +438,8 @@ public class FinalProjServlet extends HttpServlet {
 			}
 			statement.setBoolean(8, hasCarfax);
 			statement.setInt(9, carInfoId);
+			statement.setString(10, description); //odo
+			statement.setInt(11, price); //odo
 			
 			System.out.println(statement.toString());
 			int row = statement.executeUpdate();

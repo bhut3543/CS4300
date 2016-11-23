@@ -17,5 +17,9 @@
     	<img src="/4300Project/FinalProjServlet?action=getImg&pic=5&postId=${post.id}" onerror="this.style.display='none'" alt=""/></td>
     	<p>${post.description}</p>
     	<p>Has Carfax: ${post.hasCarfax?c}</p>
+    	<!-- <p>Current User's Post?: ${currentUsersPost?c}</p> -->
+		<#if currentUsersPost == true>
+			<button id="editbutton">Edit Post</button>
+		</#if>
 	</body>
 </html>

@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $("#filtermakes").hide();
-	$(".filtermake").prop('checked', true);
+	$(".filtermake").prop('checked', false);
 
   var makes = ["Acura",
   "Alfa Romeo",
