@@ -112,18 +112,23 @@ public class FinalProjServlet extends HttpServlet {
 		}
 		Integer currentUser = ((Integer)session.getAttribute("id"));
 		if(currentUser == null) {
-			currentUser = 0;
+			currentUser = 1;
 		}
+		System.out.println("Current user is: " + currentUser);
 		
 		int postId = Integer.parseInt(request.getParameter("postId"));
-		String query = String.format("select * from car_post c JOIN car_info i where c.id=%d", postId);
-		
+		String query = String.format("select * from car_post c JOIN car_info i where c.id=%d AND c.car_info_id=i.id", postId);
+		System.out.println(query);
 		String id = ""+postId,  userId = null, year = null, make = null, model = null, title = null;
 		String carInfoId = null;
 		int price = 0;
 		String description = null, postTime = null;
 		boolean hasCarfax = false;
 		boolean currentUsersPost = false;
+		
+		String color = null, bodyStyle = null, engine = null, driveType = null;
+		int odometer = 0, horsepower = 0;
+		
 		
 		//get car_post info
 		ResultSet rs = dbAccess.retrieve(con, query);
@@ -140,6 +145,13 @@ public class FinalProjServlet extends HttpServlet {
 					description = rs.getString("description");
 					postTime = rs.getString("post_time");
 					hasCarfax = rs.getBoolean("has_carfax");
+
+					color = rs.getString("color");
+					bodyStyle = rs.getString("body_style");
+					engine = rs.getString("engine");
+					driveType = rs.getString("drive_type");
+					odometer = rs.getInt("odometer");
+					horsepower = rs.getInt("horsepower");
 
 					currentUsersPost = (currentUser == Integer.parseInt(userId));
 				}
@@ -172,8 +184,10 @@ public class FinalProjServlet extends HttpServlet {
 //			}
 //		}
 		CarPost post = new CarPost(id, userId, year, make, model, title, price, description, postTime, hasCarfax);
+		CarInfo info = new CarInfo(color, bodyStyle, engine, driveType, odometer, horsepower);
 		Map<String, Object> root = new HashMap<>();
 		root.put("post", post);
+		root.put("info", info);
 		root.put("currentUsersPost", currentUsersPost);
 		
 		//freemarker setup
