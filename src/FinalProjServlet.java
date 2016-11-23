@@ -333,11 +333,12 @@ public class FinalProjServlet extends HttpServlet {
 	 * SHOULD GET LAST ID FROM *NEW* FUNCTION IN DbAccessImpl
 	 */
 	private void uploadPost(Connection con, HttpServletRequest request, HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		if(session == null) {
-			return;
-		}
-		int userId = ((Integer)session.getAttribute("id"));
+//		HttpSession session = request.getSession();
+//		if(session == null) {
+//			return;
+//		}
+//		int userId = ((Integer)session.getAttribute("id"));
+		int userId = Integer.parseInt(request.getParameter("postman_id")); //POSTMAN USE ONLY
 		String vin = request.getParameter("vin").toUpperCase();
 		String make = request.getParameter("make");
 		String model = request.getParameter("model");
@@ -348,10 +349,12 @@ public class FinalProjServlet extends HttpServlet {
 		String bodyStyle = request.getParameter("body_style").toUpperCase();
 		String engine = request.getParameter("engine").toUpperCase();
 		int horsepower = Integer.parseInt(request.getParameter("hp"));
+		String description = request.getParameter("description");
 		int odometer = Integer.parseInt(request.getParameter("odometer"));
 		boolean hasCarfax = Boolean.parseBoolean(request.getParameter("has_carfax"));
-		String carInfoSql = "INSERT INTO car_info (id, vin, color, body_style, drive_type, year, make, model, engine, power_hp, odometer) " 
-				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		int price = Integer.parseInt(request.getParameter("price"));
+		String carInfoSql = "INSERT INTO car_info (id, vin, color, body_style, drive_type, year, make, model, engine, power_hp, odometer, description, price) " 
+				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		int carInfoId = -1;
 		try {
 			System.out.println("info id is " + carInfoId);
@@ -366,6 +369,8 @@ public class FinalProjServlet extends HttpServlet {
 			statement.setString(8, engine); //engine
 			statement.setInt(9, horsepower); //hp
 			statement.setInt(10, odometer); //odo
+			statement.setString(11, description); //odo
+			statement.setInt(12, price); //odo
 			
 			//BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD 
 			statement.executeUpdate(); 
