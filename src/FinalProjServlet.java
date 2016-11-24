@@ -66,6 +66,9 @@ public class FinalProjServlet extends HttpServlet {
 		case "upload":
 			uploadPost(con, request, response);
 			break;
+		case "update":
+			updatePost(con, request, response);
+			break;
 		case "view":
 			viewPosts(con, request, response);
 			break;
@@ -80,6 +83,11 @@ public class FinalProjServlet extends HttpServlet {
 		default:
 			break;		
 		}
+	}
+
+	private void updatePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("Update post! " + request.getParameterMap().size());
+		
 	}
 
 	private void checkValidUsername(Connection con, HttpServletRequest request, HttpServletResponse response) {
