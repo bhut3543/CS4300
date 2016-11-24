@@ -106,13 +106,12 @@ public class FinalProjServlet extends HttpServlet {
 	}
 
 	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("Hello test");
 		HttpSession session = request.getSession();
-		if(session == null) {
-			return;
-		}
+		
 		Integer currentUser = ((Integer)session.getAttribute("id"));
 		if(currentUser == null) {
-			currentUser = 1;
+			currentUser = -1;
 		}
 		System.out.println("Current user is: " + currentUser);
 		
@@ -151,7 +150,7 @@ public class FinalProjServlet extends HttpServlet {
 					engine = rs.getString("engine");
 					driveType = rs.getString("drive_type");
 					odometer = rs.getInt("odometer");
-					horsepower = rs.getInt("horsepower");
+					horsepower = rs.getInt("power_hp");
 
 					currentUsersPost = (currentUser == Integer.parseInt(userId));
 				}
