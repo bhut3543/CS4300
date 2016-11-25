@@ -86,8 +86,38 @@ public class FinalProjServlet extends HttpServlet {
 	}
 
 	private void updatePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("Update post! " + request.getParameterMap().size());
+		String userId = null;
 		
+		String postId = request.getParameter("post_id");
+		ResultSet tempSet = dbAccess.retrieve(con, "select car_info_id from car_post where id=" + postId);
+		int infoId = 0;
+		try {
+			tempSet.next();
+			infoId = tempSet.getInt("car_info_id");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		String price = request.getParameter("price");
+		String make = request.getParameter("make");
+		String model = request.getParameter("model");
+		String year = request.getParameter("year");
+		String title = request.getParameter("title");
+		String color = request.getParameter("color").toUpperCase();
+		String driveType = request.getParameter("drive_type").toUpperCase();
+		String bodyStyle = request.getParameter("body_style").toUpperCase();
+		String engine = request.getParameter("engine").toUpperCase();
+		int horsepower = Integer.parseInt(request.getParameter("hp"));
+		String description = request.getParameter("description");
+		int odometer = Integer.parseInt(request.getParameter("odometer"));
+		
+		String infoQuery = String.format("UPDATE car_info SET make='%s', model='%s', color='%s', body_style='%s', engine='%s', power_hp='%s', odometer='%s' WHERE id=%d", 
+				make, model, color, bodyStyle, engine, horsepower, odometer, infoId);
+		String postQuery = String.format("UPDATE car_post SET title='%s', price='%s', description='%s' WHERE id=%s", title, price, description, postId);
+
+		dbAccess.update(con, infoQuery);
+		dbAccess.update(con, postQuery);
 	}
 
 	private void checkValidUsername(Connection con, HttpServletRequest request, HttpServletResponse response) {
@@ -367,12 +397,12 @@ public class FinalProjServlet extends HttpServlet {
 	 * SHOULD GET LAST ID FROM *NEW* FUNCTION IN DbAccessImpl
 	 */
 	private void uploadPost(Connection con, HttpServletRequest request, HttpServletResponse response) {
-//		HttpSession session = request.getSession();
+		HttpSession session = request.getSession();
 //		if(session == null) {
 //			return;
 //		}
-//		int userId = ((Integer)session.getAttribute("id"));
-		int userId = Integer.parseInt(request.getParameter("postman_id")); //POSTMAN USE ONLY
+		int userId = ((Integer)session.getAttribute("id"));
+//		int userId = Integer.parseInt(request.getParameter("postman_id")); //POSTMAN USE ONLY
 		String vin = request.getParameter("vin").toUpperCase();
 		String make = request.getParameter("make");
 		String model = request.getParameter("model");
