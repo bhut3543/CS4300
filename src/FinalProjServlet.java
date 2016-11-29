@@ -90,7 +90,7 @@ public class FinalProjServlet extends HttpServlet {
 	private void deletePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String postId = request.getParameter("post_id");
 		String user = request.getParameter("user"), pass = request.getParameter("pass");
-		ResultSet tempSet = dbAccess.retrieve(con, "select car_info_id from car_post where id=" + postId);
+		ResultSet tempSet = dbAccess.retrieve(con, "select car_info_id, user_id from car_post where id=" + postId);
 		int infoId = 0;
 		int userId = 0;
 		try {
@@ -101,7 +101,7 @@ public class FinalProjServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		System.out.println(user + " " + pass);
 		//you have postId and infoId and userId
 		//need to validate user before doing any kind of delete
 		ResultSet userSet = dbAccess.retrieve(con, "select * from user where id=" + userId);
@@ -109,7 +109,7 @@ public class FinalProjServlet extends HttpServlet {
 		try {
 			userSet.next();
 			boolean userOk = user.equals(userSet.getString("user"));
-			boolean passOk = user.equals(userSet.getString("pass"));
+			boolean passOk = pass.equals(userSet.getString("pass"));
 			validated = (userOk && passOk);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -120,6 +120,8 @@ public class FinalProjServlet extends HttpServlet {
 			String iDeleteQ = "DELETE from car_info where id=" + infoId;
 			dbAccess.delete(con, pDeleteQ);
 			dbAccess.delete(con, iDeleteQ);
+		} else {
+			System.out.println("Incorrect validation");
 		}
 		
 	}
@@ -150,11 +152,10 @@ public class FinalProjServlet extends HttpServlet {
 		String engine = request.getParameter("engine").toUpperCase();
 		int horsepower = Integer.parseInt(request.getParameter("hp"));
 		String description = request.getParameter("description");
-		System.out.println(description);
 		int odometer = Integer.parseInt(request.getParameter("odometer"));
 		
-		String infoQuery = String.format("UPDATE car_info SET year='%s', make='%s', model='%s', color='%s', body_style='%s', engine='%s', power_hp='%s', odometer='%s' WHERE id=%d", 
-				year, make, model, color, bodyStyle, engine, horsepower, odometer, infoId);
+		String infoQuery = String.format("UPDATE car_info SET vin='%s', drive_type='%s', year='%s', make='%s', model='%s', color='%s', body_style='%s', engine='%s', power_hp='%s', odometer='%s' WHERE id=%d", 
+				vin, driveType, year, make, model, color, bodyStyle, engine, horsepower, odometer, infoId);
 		String postQuery = String.format("UPDATE car_post SET title='%s', price='%s', description='%s' WHERE id=%s", title, price, description, postId);
 
 		dbAccess.update(con, infoQuery);

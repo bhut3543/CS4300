@@ -1,4 +1,26 @@
 $(document).ready(function() {
+  $("#dialog").hide();
+
+  $("#deletebutton").click(function() {
+      $("#dialog").dialog();
+  });
+  $("#deletesubmit").click(function() {
+    var postId = getQueryParams(window.location.search).postId;
+    var user = $("#user").val();
+    var pass = $("#pass").val();
+
+    $.post("http://localhost:8080/4300Project/FinalProjServlet?action=delete",
+    {
+      action:"delete",
+      post_id:postId,
+      user:user,
+      pass:pass
+    },
+    function(data, status){
+        alert("Deleted Successfully!");
+        window.location.reload();
+    });
+  })
   $("#editbutton").click(function() {
     if($("#editbutton").html() == 'Edit Post') {
       console.log("EDIT");
@@ -91,4 +113,5 @@ $(document).ready(function() {
 
       return params;
     }
+
 });

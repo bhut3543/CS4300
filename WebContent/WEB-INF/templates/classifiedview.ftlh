@@ -41,5 +41,12 @@
 			<button id="editbutton">Edit Post</button>
 			<button id="deletebutton">Delete Post</button>
 		</#if>
+		<div id="dialog" title="Confirm Delete">
+			<h3>Please re-enter your login credentials to delete this post</h3>
+				<label>Username: <input type="text" id="user" /></label>
+				<label>Password: <input type="password" id="pass" /></label>
+				<input type="submit" id="deletesubmit" value="Delete"/>
+			
+		</div>
 	</body>
 </html>
