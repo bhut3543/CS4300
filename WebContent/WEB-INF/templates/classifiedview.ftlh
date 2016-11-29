@@ -39,6 +39,7 @@
 			</fieldset>
 		<#if currentUsersPost == true>
 			<button id="editbutton">Edit Post</button>
+			<button id="deletebutton">Delete Post</button>
 		</#if>
 	</body>
 </html>

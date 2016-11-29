@@ -80,9 +80,48 @@ public class FinalProjServlet extends HttpServlet {
 			break;
 		case "regval":
 			checkValidUsername(con, request, response);
+		case "delete":
+			deletePost(con, request, response);
 		default:
 			break;		
 		}
+	}
+
+	private void deletePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		String postId = request.getParameter("post_id");
+		String user = request.getParameter("user"), pass = request.getParameter("pass");
+		ResultSet tempSet = dbAccess.retrieve(con, "select car_info_id from car_post where id=" + postId);
+		int infoId = 0;
+		int userId = 0;
+		try {
+			tempSet.next();
+			infoId = tempSet.getInt("car_info_id");
+			userId = tempSet.getInt("user_id");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//you have postId and infoId and userId
+		//need to validate user before doing any kind of delete
+		ResultSet userSet = dbAccess.retrieve(con, "select * from user where id=" + userId);
+		boolean validated = false;
+		try {
+			userSet.next();
+			boolean userOk = user.equals(userSet.getString("user"));
+			boolean passOk = user.equals(userSet.getString("pass"));
+			validated = (userOk && passOk);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(validated) {
+			String pDeleteQ = "DELETE from car_post where id=" + postId;
+			String iDeleteQ = "DELETE from car_info where id=" + infoId;
+			dbAccess.delete(con, pDeleteQ);
+			dbAccess.delete(con, iDeleteQ);
+		}
+		
 	}
 
 	private void updatePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
