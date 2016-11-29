@@ -25,6 +25,10 @@
     	<p>Current User's Post?: ${currentUsersPost?c}</p>
 			<fieldset>
 				<legend>Specs</legend>
+				<p id="year">Year: ${info.year}</p>
+				<p id="make">Make: ${info.make}</p>
+				<p id="model">Model: ${info.model}</p>
+				<p id="vin">VIN #: ${info.vin}</p>
 				<p id="color">Color: ${info.color}</p>
 				<p id="bodyStyle">Body Style: ${info.bodyStyle}</p>
 				<p id="driveType">Drive Type: ${info.driveType}</p>

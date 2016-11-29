@@ -98,8 +98,9 @@ public class FinalProjServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		String price = request.getParameter("price");
+		String vin = request.getParameter("vin");
 		String make = request.getParameter("make");
 		String model = request.getParameter("model");
 		String year = request.getParameter("year");
@@ -110,10 +111,11 @@ public class FinalProjServlet extends HttpServlet {
 		String engine = request.getParameter("engine").toUpperCase();
 		int horsepower = Integer.parseInt(request.getParameter("hp"));
 		String description = request.getParameter("description");
+		System.out.println(description);
 		int odometer = Integer.parseInt(request.getParameter("odometer"));
 		
-		String infoQuery = String.format("UPDATE car_info SET make='%s', model='%s', color='%s', body_style='%s', engine='%s', power_hp='%s', odometer='%s' WHERE id=%d", 
-				make, model, color, bodyStyle, engine, horsepower, odometer, infoId);
+		String infoQuery = String.format("UPDATE car_info SET year='%s', make='%s', model='%s', color='%s', body_style='%s', engine='%s', power_hp='%s', odometer='%s' WHERE id=%d", 
+				year, make, model, color, bodyStyle, engine, horsepower, odometer, infoId);
 		String postQuery = String.format("UPDATE car_post SET title='%s', price='%s', description='%s' WHERE id=%s", title, price, description, postId);
 
 		dbAccess.update(con, infoQuery);
@@ -165,6 +167,7 @@ public class FinalProjServlet extends HttpServlet {
 		
 		String color = null, bodyStyle = null, engine = null, driveType = null;
 		int odometer = 0, horsepower = 0;
+		String vin = null;
 		
 		
 		//get car_post info
@@ -179,6 +182,7 @@ public class FinalProjServlet extends HttpServlet {
 					model = rs.getString("model");
 					title = rs.getString("title");
 					price = rs.getInt("price");
+					vin = rs.getString("vin");
 					description = rs.getString("description");
 					postTime = rs.getString("post_time");
 					hasCarfax = rs.getBoolean("has_carfax");
@@ -220,8 +224,11 @@ public class FinalProjServlet extends HttpServlet {
 //				e.printStackTrace();
 //			}
 //		}
-		CarPost post = new CarPost(id, userId, year, make, model, title, price, description, postTime, hasCarfax);
-		CarInfo info = new CarInfo(color, bodyStyle, engine, driveType, odometer, horsepower);
+//		CarPost post = new CarPost(id, userId, title, price, description, postTime, hasCarfax);
+//		CarInfo info = new CarInfo(color, bodyStyle, engine, driveType, odometer, horsepower);
+		
+		CarPost post = new CarPost(id, userId, title, price, description, postTime, hasCarfax);
+		CarInfo info = new CarInfo(vin, color, bodyStyle, engine, driveType, odometer, horsepower, year, make, model);
 		Map<String, Object> root = new HashMap<>();
 		root.put("post", post);
 		root.put("info", info);
@@ -347,7 +354,7 @@ public class FinalProjServlet extends HttpServlet {
 		
 		//;
 		
-		ArrayList<CarPost> posts = new ArrayList<>();
+		ArrayList<ClassifiedObj> posts = new ArrayList<>();
 		
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs != null) {
@@ -359,7 +366,8 @@ public class FinalProjServlet extends HttpServlet {
 					String title = rs.getString("title");
 					String id = rs.getString("id");
 					String userId = rs.getString("user_id");
-					CarPost post = new CarPost(id, userId, year, make, model, title);
+					ClassifiedObj post = new ClassifiedObj(id, userId, year, make, model, title);
+//					CarPost post = new CarPost(null, userId, userId, title, 0, null, null, false);
 					posts.add(post);
 				}
 			} catch (SQLException e) {
