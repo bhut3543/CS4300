@@ -42,7 +42,35 @@ public class ClassifiedObj {
 	String make;
 	String model;
 	String title;
-	public ClassifiedObj(String id, String userId, String year, String make, String model, String title) {
+	String color;
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
+	}
+	public String getDriveType() {
+		return driveType;
+	}
+	public void setDriveType(String driveType) {
+		this.driveType = driveType;
+	}
+	public String getBodyStyle() {
+		return bodyStyle;
+	}
+	public void setBodyStyle(String bodyStyle) {
+		this.bodyStyle = bodyStyle;
+	}
+	String driveType;
+	String bodyStyle;
+	String odometer;
+	public String getOdometer() {
+		return odometer;
+	}
+	public void setOdometer(String odometer) {
+		this.odometer = odometer;
+	}
+	public ClassifiedObj(String id, String userId, String year, String make, String model, String title, String color, String driveType, String bodyStyle, String odometer) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -50,6 +78,10 @@ public class ClassifiedObj {
 		this.make = make;
 		this.model = model;
 		this.title = title;
+		this.color = color;
+		this.driveType = driveType;
+		this.bodyStyle = bodyStyle;
+		this.odometer = odometer;
 	}
 
 }

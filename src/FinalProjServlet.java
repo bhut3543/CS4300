@@ -197,7 +197,6 @@ public class FinalProjServlet extends HttpServlet {
 		
 		int postId = Integer.parseInt(request.getParameter("postId"));
 		String query = String.format("select * from car_post c JOIN car_info i where c.id=%d AND c.car_info_id=i.id", postId);
-		System.out.println(query);
 		String id = ""+postId,  userId = null, year = null, make = null, model = null, title = null;
 		String carInfoId = null;
 		int price = 0;
@@ -241,31 +240,6 @@ public class FinalProjServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-		
-//		//get specific car_info
-//		query = String.format("select * from car_info where id=%s", postId);
-//		rs = dbAccess.retrieve(con, query);
-//		if(rs != null) {
-//			try {
-//				while(rs.next()) {
-////					carInfoId = rs.getString("car_info_id");
-////					userId = rs.getString("user_id");
-//					year = rs.getString("year");
-//					make = rs.getString("make");
-//					model = rs.getString("model");
-////					title = rs.getString("title");
-////					price = rs.getInt("price");
-////					description = rs.getString("description");
-////					postTime = rs.getString("post_time");
-////					hasCarfax = rs.getBoolean("has_carfax");
-//				}
-//			} catch (SQLException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-//		CarPost post = new CarPost(id, userId, title, price, description, postTime, hasCarfax);
-//		CarInfo info = new CarInfo(color, bodyStyle, engine, driveType, odometer, horsepower);
 		
 		CarPost post = new CarPost(id, userId, title, price, description, postTime, hasCarfax);
 		CarInfo info = new CarInfo(vin, color, bodyStyle, engine, driveType, odometer, horsepower, year, make, model);
@@ -387,14 +361,20 @@ public class FinalProjServlet extends HttpServlet {
 		String searchParam = request.getParameter("search");
 		String query = "";
 		if(searchParam == null) {
-			query = "select make,model,year,title,c.id,user_id from car_post c JOIN car_info i where c.car_info_id=i.id";
+			query = "select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id";
 		} else {
-			query = String.format("select make,model,year,title,c.id,user_id from car_post c JOIN car_info i where c.car_info_id=i.id AND (i.make='%s' OR i.model='%s' OR i.year='%s')", searchParam, searchParam, searchParam);
+			query = String.format("select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id AND (i.make='%s' OR i.model='%s' OR i.year='%s')", searchParam, searchParam, searchParam);
 		}
 		
 		//;
 		
 		ArrayList<ClassifiedObj> posts = new ArrayList<>();
+		Integer currentId = ((Integer)request.getSession().getAttribute("id"));
+		if(currentId == null) {
+			currentId = -1;
+		}
+		System.out.println("Current id is: " + currentId);
+		
 		
 		ResultSet rs = dbAccess.retrieve(con, query);
 		if(rs != null) {
@@ -406,7 +386,11 @@ public class FinalProjServlet extends HttpServlet {
 					String title = rs.getString("title");
 					String id = rs.getString("id");
 					String userId = rs.getString("user_id");
-					ClassifiedObj post = new ClassifiedObj(id, userId, year, make, model, title);
+					String color = rs.getString("color");
+					String driveType = rs.getString("drive_type");
+					String bodyStyle = rs.getString("body_style");
+					String odometer = rs.getString("odometer");
+					ClassifiedObj post = new ClassifiedObj(id, userId, year, make, model, title, color, driveType, bodyStyle, odometer);
 //					CarPost post = new CarPost(null, userId, userId, title, 0, null, null, false);
 					posts.add(post);
 				}
@@ -427,6 +411,7 @@ public class FinalProjServlet extends HttpServlet {
 				e.printStackTrace();
 		}
 		Map<String, Object> root = new HashMap<>();
+		root.put("currentId", currentId);
 		root.put("posts", posts);
 		Template temp;
 		try {

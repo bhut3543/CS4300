@@ -18,7 +18,7 @@ $(document).ready(function() {
     },
     function(data, status){
         alert("Deleted Successfully!");
-        window.location.reload();
+        window.location = "http://localhost:8080/4300Project/FinalProjServlet?action=view"
     });
   })
   $("#editbutton").click(function() {
