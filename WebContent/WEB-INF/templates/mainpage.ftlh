@@ -3,11 +3,18 @@
 	<head>
 		<meta charset="UTF-8">
 		<script src="scripts/validate.js" type="text/javascript"></script>
+		<script src="scripts/jquery.js" type="text/javascript"></script>
+		<script src="scripts/jquery-ui.js" type="text/javascript"></script>
+		<script src="scripts/mainpage.js" type="text/javascript"></script>
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<title>Vehicles for Harambe</title>
 	</head>
 	<body>
+		<div id="meta" hidden>
+			<p id="id">${id}</p>
+		</div>
 		<h1>Welcome ${username}!</h1>
+		<h4><a href="http://localhost:8080/4300Project/FinalProjServlet?action=profile&id=${id}">View your profile</h4>
     <a href="login.html">Login to VFH</a><br /><br />
     <a href="FinalProjServlet?action=view">View Classifieds</a>
     <h1>Post to Classifieds</h1>

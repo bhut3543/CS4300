@@ -82,10 +82,85 @@ public class FinalProjServlet extends HttpServlet {
 			checkValidUsername(con, request, response);
 		case "delete":
 			deletePost(con, request, response);
+			break;
+		case "profile":
+			viewProfile(con, request, response);
 		default:
 			break;		
 		}
 	}
+
+	private void viewProfile(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		int paramId = Integer.parseInt(request.getParameter("id"));
+		Integer currentUser = ((Integer)request.getSession().getAttribute("id"));
+		if(currentUser == null) {
+			currentUser = -1;
+		}
+		String searchParam = request.getParameter("search");
+		String query = "";
+		if(searchParam == null) {
+			query = "select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id AND c.user_id="+currentUser;
+		} else {
+			query = String.format("select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id AND (i.make='%s' OR i.model='%s' OR i.year='%s') AND c.user_id=%d", searchParam, searchParam, searchParam,currentUser);
+		}
+		
+		ArrayList<ClassifiedObj> posts = new ArrayList<>();
+		Integer currentId = ((Integer)request.getSession().getAttribute("id"));
+		if(currentId == null) {
+			currentId = -1;
+		}
+		System.out.println("Current id is: " + currentId);
+		
+		
+		ResultSet rs = dbAccess.retrieve(con, query);
+		if(rs != null) {
+			try {
+				while(rs.next()) {
+					String make = rs.getString("make");
+					String model = rs.getString("model");
+					String year = rs.getString("year");
+					String title = rs.getString("title");
+					String id = rs.getString("id");
+					String userId = rs.getString("user_id");
+					String color = rs.getString("color");
+					String driveType = rs.getString("drive_type");
+					String bodyStyle = rs.getString("body_style");
+					String odometer = rs.getString("odometer");
+					ClassifiedObj post = new ClassifiedObj(id, userId, year, make, model, title, color, driveType, bodyStyle, odometer);
+//					CarPost post = new CarPost(null, userId, userId, title, 0, null, null, false);
+					posts.add(post);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		//freemarker setup
+		Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+		try {					
+			String path = getServletContext().getRealPath("/WEB-INF/templates/");
+			cfg.setDirectoryForTemplateLoading(new File(path));
+			cfg.setDefaultEncoding("UTF-8");
+			cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+			cfg.setLogTemplateExceptions(false);		
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
+		Map<String, Object> root = new HashMap<>();
+		root.put("currentId", currentId);
+		root.put("posts", posts);
+		Template temp;
+		try {
+			temp = cfg.getTemplate("profile.ftlh");
+			Writer out = new OutputStreamWriter(response.getOutputStream());
+			temp.process(root, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TemplateException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	private void deletePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String postId = request.getParameter("post_id");
@@ -186,7 +261,6 @@ public class FinalProjServlet extends HttpServlet {
 	}
 
 	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("Hello test");
 		HttpSession session = request.getSession();
 		
 		Integer currentUser = ((Integer)session.getAttribute("id"));
@@ -302,6 +376,7 @@ public class FinalProjServlet extends HttpServlet {
 	        
 			Map<String, Object> root = new HashMap<>();
 			root.put("username", username);
+			root.put("id", id);
 			
 			//freemarker setup
 			Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
