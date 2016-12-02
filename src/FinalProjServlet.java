@@ -39,6 +39,7 @@ import freemarker.template.TemplateExceptionHandler;
 public class FinalProjServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static DbAccessImpl dbAccess;
+	private static LogicImpl logic;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -46,6 +47,7 @@ public class FinalProjServlet extends HttpServlet {
     public FinalProjServlet() {
         super();
         dbAccess = new DbAccessImpl();
+        logic = new LogicImpl();
     }
 
 	/**
@@ -82,138 +84,21 @@ public class FinalProjServlet extends HttpServlet {
 			checkValidUsername(con, request, response);
 		case "delete":
 			deletePost(con, request, response);
-			break;
-		case "profile":
-			viewProfile(con, request, response);
 		default:
 			break;		
 		}
 	}
 
-	private void viewProfile(Connection con, HttpServletRequest request, HttpServletResponse response) {
-		int paramId = Integer.parseInt(request.getParameter("id"));
-		Integer currentUser = ((Integer)request.getSession().getAttribute("id"));
-		if(currentUser == null) {
-			currentUser = -1;
-		}
-		String searchParam = request.getParameter("search");
-		String query = "";
-		if(searchParam == null) {
-			query = "select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id AND c.user_id="+currentUser;
-		} else {
-			query = String.format("select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id AND (i.make='%s' OR i.model='%s' OR i.year='%s') AND c.user_id=%d", searchParam, searchParam, searchParam,currentUser);
-		}
-		
-		ArrayList<ClassifiedObj> posts = new ArrayList<>();
-		Integer currentId = ((Integer)request.getSession().getAttribute("id"));
-		if(currentId == null) {
-			currentId = -1;
-		}
-		System.out.println("Current id is: " + currentId);
-		
-		
-		ResultSet rs = dbAccess.retrieve(con, query);
-		if(rs != null) {
-			try {
-				while(rs.next()) {
-					String make = rs.getString("make");
-					String model = rs.getString("model");
-					String year = rs.getString("year");
-					String title = rs.getString("title");
-					String id = rs.getString("id");
-					String userId = rs.getString("user_id");
-					String color = rs.getString("color");
-					String driveType = rs.getString("drive_type");
-					String bodyStyle = rs.getString("body_style");
-					String odometer = rs.getString("odometer");
-					ClassifiedObj post = new ClassifiedObj(id, userId, year, make, model, title, color, driveType, bodyStyle, odometer);
-//					CarPost post = new CarPost(null, userId, userId, title, 0, null, null, false);
-					posts.add(post);
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		//freemarker setup
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
-		try {					
-			String path = getServletContext().getRealPath("/WEB-INF/templates/");
-			cfg.setDirectoryForTemplateLoading(new File(path));
-			cfg.setDefaultEncoding("UTF-8");
-			cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-			cfg.setLogTemplateExceptions(false);		
-		} catch (IOException e) {
-				e.printStackTrace();
-		}
-		Map<String, Object> root = new HashMap<>();
-		root.put("currentId", currentId);
-		root.put("posts", posts);
-		Template temp;
-		try {
-			temp = cfg.getTemplate("profile.ftlh");
-			Writer out = new OutputStreamWriter(response.getOutputStream());
-			temp.process(root, out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TemplateException e) {
-			e.printStackTrace();
-		}
-	}
-
-
 	private void deletePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String postId = request.getParameter("post_id");
 		String user = request.getParameter("user"), pass = request.getParameter("pass");
-		ResultSet tempSet = dbAccess.retrieve(con, "select car_info_id, user_id from car_post where id=" + postId);
-		int infoId = 0;
-		int userId = 0;
-		try {
-			tempSet.next();
-			infoId = tempSet.getInt("car_info_id");
-			userId = tempSet.getInt("user_id");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(user + " " + pass);
-		//you have postId and infoId and userId
-		//need to validate user before doing any kind of delete
-		ResultSet userSet = dbAccess.retrieve(con, "select * from user where id=" + userId);
-		boolean validated = false;
-		try {
-			userSet.next();
-			boolean userOk = user.equals(userSet.getString("user"));
-			boolean passOk = pass.equals(userSet.getString("pass"));
-			validated = (userOk && passOk);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(validated) {
-			String pDeleteQ = "DELETE from car_post where id=" + postId;
-			String iDeleteQ = "DELETE from car_info where id=" + infoId;
-			dbAccess.delete(con, pDeleteQ);
-			dbAccess.delete(con, iDeleteQ);
-		} else {
-			System.out.println("Incorrect validation");
-		}
-		
+		logic.deletePost(postId, user, pass);
 	}
 
 	private void updatePost(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String userId = null;
 		
 		String postId = request.getParameter("post_id");
-		ResultSet tempSet = dbAccess.retrieve(con, "select car_info_id from car_post where id=" + postId);
-		int infoId = 0;
-		try {
-			tempSet.next();
-			infoId = tempSet.getInt("car_info_id");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		String price = request.getParameter("price");
 		String vin = request.getParameter("vin");
@@ -227,40 +112,31 @@ public class FinalProjServlet extends HttpServlet {
 		String engine = request.getParameter("engine").toUpperCase();
 		int horsepower = Integer.parseInt(request.getParameter("hp"));
 		String description = request.getParameter("description");
+		String addr = request.getParameter("addr");
 		int odometer = Integer.parseInt(request.getParameter("odometer"));
 		
-		String infoQuery = String.format("UPDATE car_info SET vin='%s', drive_type='%s', year='%s', make='%s', model='%s', color='%s', body_style='%s', engine='%s', power_hp='%s', odometer='%s' WHERE id=%d", 
-				vin, driveType, year, make, model, color, bodyStyle, engine, horsepower, odometer, infoId);
-		String postQuery = String.format("UPDATE car_post SET title='%s', price='%s', description='%s' WHERE id=%s", title, price, description, postId);
-
-		dbAccess.update(con, infoQuery);
-		dbAccess.update(con, postQuery);
+		logic.updatePost(postId, price, make, model, year, title, color, driveType, bodyStyle, engine, horsepower, description, odometer, addr);
 	}
 
 	private void checkValidUsername(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		response.setContentType("text/plain");
 		String user = request.getParameter("username");
 		System.out.println(user);
-		String query = String.format("select id from user where user='%s'", user);
-		
+		String valid = logic.checkValidUsername(user);
+		PrintWriter pw;
 		try {
-			PrintWriter pw = response.getWriter();
-
-			ResultSet rs = dbAccess.retrieve(con, query);
-			if(rs == null) {
-				pw.write("true");
-			} else {
-				pw.write("false");
-			}
-		} catch (IOException e1) {
+			pw = response.getWriter();
+			pw.write(valid);
+			System.out.println("test2");
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			System.out.println("test");
+			e.printStackTrace();
 		}
-		
-		
 	}
 
 	private void getClassified(Connection con, HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("Hello test");
 		HttpSession session = request.getSession();
 		
 		Integer currentUser = ((Integer)session.getAttribute("id"));
@@ -270,53 +146,36 @@ public class FinalProjServlet extends HttpServlet {
 		System.out.println("Current user is: " + currentUser);
 		
 		int postId = Integer.parseInt(request.getParameter("postId"));
-		String query = String.format("select * from car_post c JOIN car_info i where c.id=%d AND c.car_info_id=i.id", postId);
-		String id = ""+postId,  userId = null, year = null, make = null, model = null, title = null;
-		String carInfoId = null;
-		int price = 0;
-		String description = null, postTime = null;
-		boolean hasCarfax = false;
 		boolean currentUsersPost = false;
 		
-		String color = null, bodyStyle = null, engine = null, driveType = null;
-		int odometer = 0, horsepower = 0;
-		String vin = null;
+//		//get specific car_info
+//		query = String.format("select * from car_info where id=%s", postId);
+//		rs = dbAccess.retrieve(con, query);
+//		if(rs != null) {
+//			try {
+//				while(rs.next()) {
+////					carInfoId = rs.getString("car_info_id");
+////					userId = rs.getString("user_id");
+//					year = rs.getString("year");
+//					make = rs.getString("make");
+//					model = rs.getString("model");
+////					title = rs.getString("title");
+////					price = rs.getInt("price");
+////					description = rs.getString("description");
+////					postTime = rs.getString("post_time");
+////					hasCarfax = rs.getBoolean("has_carfax");
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		CarPost post = new CarPost(id, userId, title, price, description, postTime, hasCarfax);
+//		CarInfo info = new CarInfo(color, bodyStyle, engine, driveType, odometer, horsepower);
 		
-		
-		//get car_post info
-		ResultSet rs = dbAccess.retrieve(con, query);
-		if(rs != null) {
-			try {
-				while(rs.next()) {
-					carInfoId = rs.getString("car_info_id");
-					userId = rs.getString("user_id");
-					year = rs.getString("year");
-					make = rs.getString("make");
-					model = rs.getString("model");
-					title = rs.getString("title");
-					price = rs.getInt("price");
-					vin = rs.getString("vin");
-					description = rs.getString("description");
-					postTime = rs.getString("post_time");
-					hasCarfax = rs.getBoolean("has_carfax");
-
-					color = rs.getString("color");
-					bodyStyle = rs.getString("body_style");
-					engine = rs.getString("engine");
-					driveType = rs.getString("drive_type");
-					odometer = rs.getInt("odometer");
-					horsepower = rs.getInt("power_hp");
-
-					currentUsersPost = (currentUser == Integer.parseInt(userId));
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		CarPost post = new CarPost(id, userId, title, price, description, postTime, hasCarfax);
-		CarInfo info = new CarInfo(vin, color, bodyStyle, engine, driveType, odometer, horsepower, year, make, model);
+		CarPost post = logic.getClassifiedCarPost(postId, currentUser);
+		currentUsersPost = (currentUser == Integer.parseInt(post.getUserId()));
+		CarInfo info = logic.getClassifiedCarInfo(postId, currentUser);
 		Map<String, Object> root = new HashMap<>();
 		root.put("post", post);
 		root.put("info", info);
@@ -354,19 +213,7 @@ public class FinalProjServlet extends HttpServlet {
 		String password = request.getParameter("password");
 	
 		int id = -1;
-		
-		String query = String.format("select id from user where user=\"%s\" AND pass=\"%s\" limit 1", username, password);
-		ResultSet rs = dbAccess.retrieve(con, query);
-		if(rs != null) {
-			try {
-				while(rs.next()) {
-					id = rs.getInt("id");
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		id = logic.loginUser(username, password);
 		
 		if(id != -1) {
 			//resultset wasn't empty!
@@ -411,69 +258,22 @@ public class FinalProjServlet extends HttpServlet {
 		if(picNum < 1 || picNum > 5) {
 			picNum = 1;
 		}
-		String imgStr = "img" + picNum;
-		String query = "select " + imgStr + " from car_post where id=" + postId;
-		ResultSet rs = dbAccess.retrieve(con, query);
-		if(rs!=null) {
-			try {
-				if(rs.next()) {
-					Blob blob = rs.getBlob(imgStr);
-					BufferedOutputStream bos = new BufferedOutputStream( response.getOutputStream( ) );
-					bos.write(blob.getBytes(1, (int)blob.length()));
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-			}
+		try {
+				BufferedOutputStream bos = new BufferedOutputStream( response.getOutputStream( ) );
+				bos.write(logic.getImage(postId, picNum));
+			}catch (IOException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
 		}
 		
 	}
 
 	private void viewPosts(Connection con, HttpServletRequest request, HttpServletResponse response) {
 		String searchParam = request.getParameter("search");
-		String query = "";
-		if(searchParam == null) {
-			query = "select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id";
-		} else {
-			query = String.format("select make,model,year,title,c.id,user_id,color,drive_type,body_style,odometer from car_post c JOIN car_info i where c.car_info_id=i.id AND (i.make='%s' OR i.model='%s' OR i.year='%s')", searchParam, searchParam, searchParam);
-		}
-		
-		//;
-		
-		ArrayList<ClassifiedObj> posts = new ArrayList<>();
 		Integer currentId = ((Integer)request.getSession().getAttribute("id"));
-		if(currentId == null) {
-			currentId = -1;
-		}
-		System.out.println("Current id is: " + currentId);
+
+		Map<String, Object> root = logic.viewPosts(searchParam, currentId);
 		
-		
-		ResultSet rs = dbAccess.retrieve(con, query);
-		if(rs != null) {
-			try {
-				while(rs.next()) {
-					String make = rs.getString("make");
-					String model = rs.getString("model");
-					String year = rs.getString("year");
-					String title = rs.getString("title");
-					String id = rs.getString("id");
-					String userId = rs.getString("user_id");
-					String color = rs.getString("color");
-					String driveType = rs.getString("drive_type");
-					String bodyStyle = rs.getString("body_style");
-					String odometer = rs.getString("odometer");
-					ClassifiedObj post = new ClassifiedObj(id, userId, year, make, model, title, color, driveType, bodyStyle, odometer);
-//					CarPost post = new CarPost(null, userId, userId, title, 0, null, null, false);
-					posts.add(post);
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		//freemarker setup
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
 		try {					
@@ -485,9 +285,7 @@ public class FinalProjServlet extends HttpServlet {
 		} catch (IOException e) {
 				e.printStackTrace();
 		}
-		Map<String, Object> root = new HashMap<>();
-		root.put("currentId", currentId);
-		root.put("posts", posts);
+		
 		Template temp;
 		try {
 			temp = cfg.getTemplate("view.ftlh");
@@ -520,6 +318,7 @@ public class FinalProjServlet extends HttpServlet {
 		String driveType = request.getParameter("drive_type").toUpperCase();
 		String bodyStyle = request.getParameter("body_style").toUpperCase();
 		String engine = request.getParameter("engine").toUpperCase();
+		String addr = request.getParameter("addr");
 		int horsepower = Integer.parseInt(request.getParameter("hp"));
 		String description = request.getParameter("description");
 		int odometer = Integer.parseInt(request.getParameter("odometer"));
@@ -566,7 +365,7 @@ public class FinalProjServlet extends HttpServlet {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-        String sql = "INSERT INTO car_post (id, user_id, title, img1, img2, img3, img4, img5, has_carfax, car_info_id, description, price) values (NULL, ?, ?, ?,?,?,?,?, ?, ?,?,?)";
+        String sql = "INSERT INTO car_post (id, user_id, title, img1, img2, img3, img4, img5, has_carfax, car_info_id, description, price, addr) values (NULL, ?, ?, ?,?,?,?,?, ?, ?,?,?,?)";
         try {
 			PreparedStatement statement = con.prepareStatement(sql);
 			statement.setInt(1, userId);
@@ -599,11 +398,18 @@ public class FinalProjServlet extends HttpServlet {
 			statement.setInt(9, carInfoId);
 			statement.setString(10, description); //odo
 			statement.setInt(11, price); //odo
+			statement.setString(12, addr); //odo
 			
 			System.out.println(statement.toString());
 			int row = statement.executeUpdate();
 			
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			response.sendRedirect("http://localhost:8080/4300Project/FinalProjServlet?action=view&search=" + title);
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

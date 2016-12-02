@@ -38,6 +38,7 @@ $(document).ready(function() {
   	  var horsepower = $("#horsepower").text().substring(12);
   	  var odometer = $("#odometer").text().substring(10).replace(/\D/g,'');
   	  var carfax = $("#carfax").text().substring(8);
+  	  var addr = $("#addr").text();
 
   	$("#editbutton").html("Save Changes");
     	$("#year").replaceWith("Year: <input id=\"year\" type=\"text\" value=\"" + year + "\"/><br/><br/>");
@@ -54,6 +55,8 @@ $(document).ready(function() {
     	$("#odometer").replaceWith("Odometer: <input id=\"odometer\" type=\"text\" value=\"" + odometer + "\"/><br/><br/>");
     	$("#carfax").replaceWith("CarFax: <input id=\"carfax\" type=\"text\" value=\"" + carfax + "\"/><br/><br/>");
     	$("#description").replaceWith("<br/><textarea id=\"description\" value=\"" + description + "\"/><br/><br/>");
+    	$("#addr").replaceWith("<br/><input id=\"addr\" type=\"text\" value=\"" + addr + "\"/><br/><br/>");
+    	
     } else {
     	// $("#editbutton").html("Edit Post");
       //perform save code here with AJAX!!!
@@ -72,6 +75,7 @@ $(document).ready(function() {
   	  var horsepower = $("#horsepower").val();
   	  var odometer = $("#odometer").val();
   	  var carfax = $("#carfax").val();
+  	  var addr = $("#addr").val();
 
     $.post("http://localhost:8080/4300Project/FinalProjServlet?action=update",
     {
@@ -90,10 +94,11 @@ $(document).ready(function() {
       engine:engine,
       hp:horsepower,
       odometer:odometer,
-      has_carfax:true
+      has_carfax:true,
+      addr:addr
     },
     function(data, status){
-        alert("Data: " + data + "\nStatus: " + status);
+        alert("Saved!");
         window.location.reload();
     });
 

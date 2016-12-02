@@ -79,6 +79,7 @@
       <label>Engine Type: <input type="text" name="engine" required/></label><br />
       <label>Horsepower: <input type="number" name="hp" required/></label><br />
       <label>Odometer: <input type="number" name="odometer" required/></label><br />
+      <label>Address: <input type="text" name="addr" required/></label><br />
       <label>Has CarFax?: <input type="checkbox" name="has_carfax" required/></label><br />
       <input type="file" name="pic1" /><br />
       <input type="file" name="pic2" /><br />

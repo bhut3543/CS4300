@@ -5,8 +5,15 @@ public class CarPost {
 	int price;
 	String description, postTime;
 	boolean hasCarfax;
+	String addr;
+	public String getAddr() {
+		return addr;
+	}
+	public void setAddr(String addr) {
+		this.addr = addr;
+	}
 	public CarPost(String id, String userId, String title, int price, String description, String postTime,
-			boolean hasCarfax) {
+			boolean hasCarfax, String addr) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -15,6 +22,7 @@ public class CarPost {
 		this.description = description;
 		this.postTime = postTime;
 		this.hasCarfax = hasCarfax;
+		this.addr = addr;
 	}
 	public String getId() {
 		return id;

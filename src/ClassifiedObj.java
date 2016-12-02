@@ -1,6 +1,12 @@
 
 public class ClassifiedObj {
-	String id;
+	String id, addr;
+	public String getAddr() {
+		return addr;
+	}
+	public void setAddr(String addr) {
+		this.addr = addr;
+	}
 	public String getId() {
 		return id;
 	}
@@ -70,7 +76,7 @@ public class ClassifiedObj {
 	public void setOdometer(String odometer) {
 		this.odometer = odometer;
 	}
-	public ClassifiedObj(String id, String userId, String year, String make, String model, String title, String color, String driveType, String bodyStyle, String odometer) {
+	public ClassifiedObj(String id, String userId, String year, String make, String model, String title, String color, String driveType, String bodyStyle, String odometer, String addr) {
 		super();
 		this.id = id;
 		this.userId = userId;
@@ -82,6 +88,7 @@ public class ClassifiedObj {
 		this.driveType = driveType;
 		this.bodyStyle = bodyStyle;
 		this.odometer = odometer;
+		this.addr = addr;
 	}
 
 }

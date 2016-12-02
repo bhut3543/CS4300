@@ -6,6 +6,11 @@ img {
   background-color: #cccccc;
 
 }
+#map {
+        height: 400px;
+        width: 400px;
+}
+
 
 #classifieds {
   width: 75%;

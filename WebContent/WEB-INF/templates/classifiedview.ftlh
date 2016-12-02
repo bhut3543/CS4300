@@ -37,6 +37,46 @@
 				<p id="odometer">Odometer: ${info.odometer}</p>
 				<p id="carfax">CarFax: ${post.hasCarfax?c}</p>
 			</fieldset>
+			
+    	<p id="addr">${post.addr}</p>
+		<div id="map"></div>
+		<script>
+      		function initMap() {
+	        	var uluru = {lat: -25.363, lng: 131.044};
+	        	var map = new google.maps.Map(document.getElementById('map'), {
+	          	zoom: 14,
+	          	center: uluru
+	        	});
+	        	var marker = new google.maps.Marker({
+	          	position: uluru,
+	          	map: map
+	        	});
+	        	var geocoder = new google.maps.Geocoder();
+				geocodeAddress(geocoder, map);
+				google.maps.event.trigger(map, "resize");
+
+      		}
+      		function geocodeAddress(geocoder, resultsMap) {
+		        var address = document.getElementById('addr').innerHTML;
+		        console.log(address);
+		        geocoder.geocode({'address': address}, function(results, status) {
+		          if (status === 'OK') {
+		            resultsMap.setCenter(results[0].geometry.location);
+		            var marker = new google.maps.Marker({
+		              map: resultsMap,
+		              position: results[0].geometry.location
+		            });
+		          } else {
+		            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
+
+    	</script>
+    	<script async defer
+    		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjPgnid6PBQ1jSOibvwcG-YRLIkvlp2_o&callback=initMap">
+    	</script>
+
 		<#if currentUsersPost == true>
 			<button id="editbutton">Edit Post</button>
 			<button id="deletebutton">Delete Post</button>
