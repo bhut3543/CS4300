@@ -1,9 +1,43 @@
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="css/main.css">
+<link rel="stylesheet" type="text/css" href="css/layout.css">
   <title>Results</title>
 </head>
-<body>
+	<body id="top">
+<div class="wrapper col1">
+  <div id="topbar">
+    <p>Tel: (678)334-6798 | Mail: Support@Vehicls4Harambe.com</p>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Classifieds</a></li>
+      <li class="last"><a href="login.html">Sign in</a></li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col2">
+  <div id="header">
+    <div class="fl_left">
+      <h1><a href="index.html">Vehicles For Harambe</a></h1>
+      <p>Be Strong For Harambe</p>
+    </div>
+    <div class="fl_right"> <a href="#"><img src="images/demo/468x60.gif" alt="" /></a> </div>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col3">
+  <div id="topnav">
+    <ul>
+      <li class="active"><a href="index.html">Homepage</a></li>
+      <li><a href="pages/full-width.html">About Us</a></li>
+      <li><a href="pages/full-width.html">Classifieds</a></li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
   <h1>Information about: ${query}</h1>
     <#if query == "actors">
     <table border=1>

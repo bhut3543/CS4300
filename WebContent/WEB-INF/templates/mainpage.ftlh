@@ -3,18 +3,45 @@
 	<head>
 		<meta charset="UTF-8">
 		<script src="scripts/validate.js" type="text/javascript"></script>
-		<script src="scripts/jquery.js" type="text/javascript"></script>
-		<script src="scripts/jquery-ui.js" type="text/javascript"></script>
-		<script src="scripts/mainpage.js" type="text/javascript"></script>
-		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" type="text/css" href="css/layout.css">
 		<title>Vehicles for Harambe</title>
-	</head>
-	<body>
-		<div id="meta" hidden>
-			<p id="id">${id}</p>
-		</div>
+	<</head>
+	<body id="top">
+<div class="wrapper col1">
+  <div id="topbar">
+    <p>Tel: (678)334-6798 | Mail: Support@Vehicls4Harambe.com</p>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Classifieds</a></li>
+      <li class="last"><a href="login.html">Sign in</a></li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col2">
+  <div id="header">
+    <div class="fl_left">
+      <h1><a href="index.html">Vehicles For Harambe</a></h1>
+      <p>Be Strong For Harambe</p>
+    </div>
+    <div class="fl_right"> <a href="#"><img src="images/demo/468x60.gif" alt="" /></a> </div>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col3">
+  <div id="topnav">
+    <ul>
+      <li class="active"><a href="index.html">Homepage</a></li>
+      <li><a href="pages/full-width.html">About Us</a></li>
+      <li><a href="pages/full-width.html">Classifieds</a></li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
 		<h1>Welcome ${username}!</h1>
-		<h4><a href="http://localhost:8080/4300Project/FinalProjServlet?action=profile&id=${id}">View your profile</h4>
     <a href="login.html">Login to VFH</a><br /><br />
     <a href="FinalProjServlet?action=view">View Classifieds</a>
     <h1>Post to Classifieds</h1>
@@ -79,7 +106,6 @@
       <label>Engine Type: <input type="text" name="engine" required/></label><br />
       <label>Horsepower: <input type="number" name="hp" required/></label><br />
       <label>Odometer: <input type="number" name="odometer" required/></label><br />
-      <label>Address: <input type="text" name="addr" required/></label><br />
       <label>Has CarFax?: <input type="checkbox" name="has_carfax" required/></label><br />
       <input type="file" name="pic1" /><br />
       <input type="file" name="pic2" /><br />

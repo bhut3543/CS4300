@@ -6,11 +6,6 @@ img {
   background-color: #cccccc;
 
 }
-#map {
-        height: 400px;
-        width: 400px;
-}
-
 
 #classifieds {
   width: 75%;
@@ -25,7 +20,6 @@ img {
 
 .dropdowns {
 	width:100%;
-  border: 1px solid black;
-  margin-bottom: 1px;
+	height:50px;
 	background-color:gray;
 }

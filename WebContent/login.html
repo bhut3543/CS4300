@@ -2,28 +2,177 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<script src="scripts/jquery.js" type="text/javascript"></script>
-		<script src="scripts/script.js" type="text/javascript"></script>
-		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<script src="scripts/index.js" type="text/javascript"></script>
+		<link rel="stylesheet" type="text/css" href="css/layout.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<title>Project</title>
 	</head>
-	<body>
-		<div id = formContainer>
-			<h1>Login to VFH</h1>
-			<form id="loginform" method="post" action="FinalProjServlet">
-			 	<input class="hidden" type="hidden" name="action" value="login"  />
-				<label>Username:<input id="username_l" name="username" type="text" value="" /></label><br/>
-     		<label>Password:<input id="password_l" name="password" type="password" value="" /></label><br/>
-     		<input type="submit" value="Login!" />
-			</form>
-			<h1>Register</h1>
-			<form id="registerform" method="post" action="FinalProjServlet">
-				<input class="hidden" type="hidden" name="action" value="register"  />
-				<label>Username:<input id="username_r" name="username" type="text" value="" /></label><br/>
-     		<label>Password:<input id="password_r" name="password" type="password" value="" /></label><br/>
-     		<input type="submit" value="Register!" />
-			</form>
-		</div>
-		<p id="error"></p>
-	</body>
+	<body id="top">
+<div class="wrapper col1">
+  <div id="topbar">
+    <p>Tel: (678)334-6798 | Mail: Support@Vehicls4Harambe.com</p>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Classifieds</a></li>
+      <li class="last"><a href="login.html">Sign in</a></li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col2">
+  <div id="header">
+    <div class="fl_left">
+      <h1><a href="index.html">Vehicles For Harambe</a></h1>
+      <p>Be Strong For Harambe</p>
+    </div>
+    <div class="fl_right"> <a href="#"><img src="images/demo/468x60.gif" alt="" /></a> </div>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col3">
+  <div id="topnav">
+    <ul>
+      <li class="active"><a href="index.html">Homepage</a></li>
+      <li><a href="pages/full-width.html">About Us</a></li>
+      <li><a href="pages/full-width.html">Classifieds</a></li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+		<div class="form">
+      
+      <ul class="tab-group">
+        <li class="tab"><a href="#signup">Sign Up</a></li>
+        <li class="tab active"><a href="#login">Log In</a></li>
+      </ul>
+      
+      <div class="tab-content">
+        <div id="signup">   
+          <h1>Sign Up for Free</h1>
+          
+          <form action="FinalProjServlet" method="post">
+          <input class="hidden" type="hidden" name="action" value="login"  />
+          <div class="top-row">
+            <div class="field-wrap">
+              <label>
+               <span class="req"></span>
+              </label>
+              <input type="text" required autocomplete="off" placeholder="First Name"/>
+            </div>
+        
+            <div class="field-wrap">
+              <label>
+              	<span class="req"></span>
+              </label>
+              <input type="text"required autocomplete="off" placeholder="Last Name"/>
+            </div>
+          </div>
+
+          <div class="field-wrap">
+            <label>
+              <span class="req"></span>
+            </label>
+            <input type="text" name="username" required autocomplete="off" placeholder="Username"/>
+          </div>
+          
+          <div class="field-wrap">
+            <label>
+              <span class="req"></span>
+            </label>
+            <input type="password" name="password" required autocomplete="off" placeholder="Password"/>
+          </div>
+          
+          <button type="submit" class="button button-block">Get Started</button>
+          <input type="submit" value="Register!" />
+          
+          </form>
+
+        </div>
+        
+        <div id="login">   
+          <h1>Welcome Back!</h1>
+          
+          <form action="FinalProjServlet" method="post">
+          
+            <div class="field-wrap">
+            <label>
+              <span class="req"></span>
+            </label>
+            <input type="text" name= "username" required autocomplete="off" placeholder="Username"/>
+          </div>
+          
+          <div class="field-wrap">
+            <label>
+              <span class="req"></span>
+            </label>
+            <input type="password" name="password" required autocomplete="off" placeholder="Password"/>
+          </div>
+          
+          <p class="forgot"><a href="#">Forgot Password?</a></p>
+          
+          <button class="button button-block">Log In</button>
+          <input type="submit" value="Register!" />
+          
+          </form>
+
+        </div>
+        
+      </div><!-- tab-content -->
+      
+</div> <!-- /form -->
+		<div class="wrapper col6">
+  <div id="footer">
+    <div id="newsletter">
+      <h2>Stay up to date with the arrivals!</h2>
+      <p>Please enter your email to join our mailing list</p>
+      <form action="#" method="post">
+        <fieldset>
+          <legend>News Letter</legend>
+          <input type="text" value="Enter Email Here&hellip;"  onfocus="this.value=(this.value=='Enter Email Here&hellip;')? '' : this.value ;" />
+          <input type="submit" name="news_go" id="news_go" value="GO" />
+        </fieldset>
+      </form>
+      <p>To unsubscribe please <a href="#">click here &raquo;</a></p>
+    </div>
+    <div class="footbox">
+      <h2>Contact Us</h2>
+      <ul>
+        <li><a href="#">Cell:(678) 987-8790</a></li>
+        <li><a href="#">Hours: 8am - 5pm</a></li>
+        <li><a href="#">Mail: Support@Vehicles.com</a></li>
+        <li class="last"><a href="#">Thank you!!</a></li>
+      </ul>
+    </div>
+    <div class="footbox">
+      <h2>Support Us</h2>
+      <ul>
+        <li><a href="#">Donate Now!</a></li>
+        <li><a href="#">Call Now!</a></li>
+        <li><a href="#">Learn More!</a></li>
+        <li class="last"><a href="#">Thank you!!</a></li>
+      </ul>
+    </div>
+    <div class="footbox">
+      <h2>Additionals</h2>
+      <ul>
+        <li><a href="#">Rims or glasses!</a></li>
+        <li><a href="#">Tires and Wheels!</a></li>
+        <li><a href="#">Jason John</a></li>
+        <li class="last"><a href="#">Thank you!!</a></li>
+      </ul>
+    </div>
+    <br class="clear" />
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col7">
+  <div id="copyright">
+    <p class="fl_left">Copyright &copy; 2016 - All Rights Reserved - <a href="#">Vehicles for Harambe</a></p>
+    <br class="clear" />
+  </div>
+</div>
+</body>
 </html>
