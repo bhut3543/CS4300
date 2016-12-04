@@ -134,3 +134,20 @@ div.wrapper h1, div.wrapper h2, div.wrapper h3, div.wrapper h4, div.wrapper h5, 
 
 #copyright{padding:15px 0;}
 #copyright p{margin:0; padding:0;}
+
+#classifieds {
+  width: 75%;
+  float:left;
+}
+
+#options {
+  width: 25%;
+  float:right;
+}
+
+.dropdowns {
+  width:100%;
+  border: 1px solid black;
+  margin-bottom: 1px;
+  background-color:gray;
+}
